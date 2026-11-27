@@ -1,0 +1,49 @@
+[project]
+name = "agent-kit"
+version = "0.0.0"
+description = "One shared agent workflow that each repository takes as a pinned, checked copy"
+requires-python = ">=3.12"
+dependencies = []
+
+[tool.uv]
+package = false
+
+[dependency-groups]
+dev = [
+    "mypy>=2.3",
+    "pytest>=9.1",
+    "pytest-randomly>=5.0.0",
+    "pytest-timeout>=2.4.0",
+    "pytest-xdist>=3.8.0",
+    "ruff>=0.16.5",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["scripts", "tests"]
+
+[tool.ruff.lint]
+select = ["ANN", "B", "E", "F", "I", "N", "RUF", "S", "SIM", "UP", "W"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101", "S105", "S106"]
+"scripts/*.py" = ["S603", "S607"]
+".claude/hooks/*.py" = ["S603", "S607"]
+"tests/test_check_instructions.py" = ["S603", "S607"]
+"tests/test_git_commit_guard.py" = ["S603", "S607"]
+"tests/test_next_issue.py" = ["S603", "S607"]
+
+[tool.mypy]
+python_version = "3.12"
+mypy_path = ["scripts"]
+strict = true
+warn_unreachable = true
+enable_error_code = ["redundant-expr", "truthy-bool", "ignore-without-code"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["scripts"]
+filterwarnings = ["error"]
+addopts = "-n auto --dist worksteal --durations=10"
+timeout = 5
