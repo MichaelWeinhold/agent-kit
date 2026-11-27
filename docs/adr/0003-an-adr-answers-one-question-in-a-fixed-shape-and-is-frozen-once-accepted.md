@@ -4,149 +4,149 @@
 - **Date:** 2026-11-27
 - **Issue:** #5
 
+In the context of a decision log agents read more than the operator does, facing records
+that drift in shape and grow into specs, we decided for one question per ADR in MADR's
+core shape, opened by a Y-statement, in direct positive sentences, frozen once accepted
+and checked by our own script, and against MADR verbatim, living records and ADR tools, to
+achieve a record an agent reads by position and trusts, accepting a new ADR per change.
+
 ## Context
 
-Nothing defines what an ADR here looks like, so each copies the last. ADR 0001 and ADR
-0002 already differ in header (`Recorded with:` against `Issue:`), heading (`Decisions`
-against `Decision`) and where rejected alternatives sit; six of 0001's nine decisions name
-none. In the base repository the kit was taken from, the drift went further: accepted ADRs
-amended in place up to eight times, statuses such as "D2 and D4 superseded, D6 amended",
-and records of up to 226 lines that read as a current spec rather than a decision.
-
-Agents read these records more often than the operator, and every rule cites `ADR n, Dm`.
-
-What practice agrees on, as of November 2026:
-
-- **Short, one decision per file, numbered, markdown beside the code** — Nygard, Fowler,
-  MADR 4, AWS, Microsoft, Google Cloud.
-- **Append-only**: a changed decision is a new record superseding the old, linked both
-  ways — AWS, Microsoft, Fowler. The UK GDS framework (2025) alone asks for updates.
-- **A fixed status** (MADR, AWS); **the options weighed** (MADR, Microsoft, Google);
-  **what triggers a re-evaluation** (Fowler); **how compliance is confirmed** (MADR 4).
-- **For agents**: an entry point in `AGENTS.md`, an index, and a status that is a field,
-  not prose (Netflix, QCon SF 2026). In controlled trials, agents follow repository
-  precedent over their defaults, and a rule the harness loads over code examples — 117 of
-  120 joint successes against 0 of 120 (Zhu et al., 2026).
+- **Nothing defines an ADR's shape here**, so each copies the last: ADR 0001 and ADR 0002
+  differ in header, heading and where alternatives sit (read on `main` and on PR 4).
+- **The base repository the kit was taken from drifted further**, by issue 5's opening
+  survey, not re-checked here: ADRs amended in place up to eight times, 226-line records.
+- **Practice agrees** (November 2026): short, numbered, one decision each, by the code,
+  append-only with supersession linked both ways (Nygard, Fowler, MADR 4, AWS, Microsoft,
+  Google Cloud; UK GDS alone asks for updates); a fixed status, the options weighed, a
+  re-evaluation trigger, a confirmation; an index and an `AGENTS.md` entry (Netflix).
+- **Agents follow what is loaded, stale or not**: a loaded rule beat code examples 117/120
+  to 0/120 (Zhu et al.); a stale instruction file beat the code in 90% of cases (Xu, Wu).
+- **Agents follow a direct, positive sentence best**: "Add …" 72% against "Never …" 17%
+  on Sonnet, conditionals last on three of four agents, a reason helping one agent and
+  costing another (Tsuchida et al.); size, position and layout had no effect (McMillan).
+- **Only what the code cannot show earns its place**: human-written context files raised
+  success about 4% at up to 19% more cost (ETH Zurich).
 
 ## Decision
 
-### D1 — One template: MADR's core, in this repository's terms
+### D1 — One template: MADR's core, opened by a Y-statement
 
 Every ADR is `docs/adr/NNNN-<slug>.md`, with these parts in this order:
 
 | Part | Holds | Required |
 |---|---|---|
-| `# N. <title>` | the decision as a statement, not a topic | always |
+| `# N. <title>` | the decision as a statement | always |
 | header | `Status`, `Date`, `Issue`; `Supersedes`, `Superseded in part` when they apply | always |
-| `## Context` | the problem, its forces, what was found | always |
-| `## Decision` | `### D1 — …` onward, each opening with its decision in one sentence | always |
-| `## Rejected alternatives` | each option, why not, and **Reopens if** | always |
-| `## Consequences` | what gets better and what gets worse | always |
+| Y-statement | one paragraph: *In the context of … facing … we decided for … and against … to achieve … accepting …* | always |
+| `## Context` | bullets of facts the code cannot show, sourced where read | always |
+| `## Decision` | `### D1 — …` onward | always |
+| `## Rejected alternatives` | a table: option, why not, reopens if | always |
+| `## Consequences` | `Good:` and `Bad:` bullets | always |
 | `## Confirmation` | per decision, what holds it or which file states it | always |
 | `## Follow-ups` | the changes filed as sub-issues | research |
-| `## Sources` | what was read, linked | research |
+| `## Sources` | what was read, linked and dated | research |
 
-The header stays bulleted bold fields, not YAML: frontmatter holds only a field a client
-reads (`.claude/rules/instruction-files.md`), and `check_issue_umbrellas.py` parses
-`- **Issue:** #<n>`. `docs/adr/template.md` holds the skeleton.
+The header is bold bullets, `- **Status:** Accepted`, which one regular expression reads,
+as `check_issue_umbrellas.py` does. `Issue` is the research issue answered, `#<n>`, or
+`none` and the issue it was recorded with. `docs/adr/template.md` holds the skeleton.
 
 ### D2 — An ADR answers one question; D1…Dn are the parts of its answer
 
-A research issue that holds independent questions gets one ADR each. D-numbers stay, so
-rules keep citing `ADR n, Dm`. A part that could be superseded while the rest stands
-belongs in its own ADR.
+A research issue with independent questions gets one ADR each, and so does a part that
+could be superseded alone. D-numbers stay, so rules keep citing `ADR n, Dm`.
 
-### D3 — An accepted ADR is frozen
+### D3 — Each decision opens with one direct, positive sentence
 
-After acceptance an ADR changes only in its header, a broken link or a typo. A changed
-decision is a new ADR with `Supersedes: ADR n`, or `ADR n, Dm` for one part. The old one's
-status becomes `Superseded by ADR m`; for one part, its header gains
-`Superseded in part: Dm by ADR m` and that part's heading the same note. No "Amended by"
-paragraphs: how something works *now* belongs in `README.md` or the instruction files.
+Each `### Dn` and the title state what holds: "A changed decision is a new ADR", not "an
+accepted ADR is never edited" nor "if a decision changes, …". The reason follows in its
+own sentence. Context, options, consequences and sources are bullets or table rows.
 
-### D4 — Status is a fixed value, and acceptance is the operator's commit
+### D4 — An accepted ADR is frozen
+
+An accepted ADR changes only in its header, a broken link or a typo. A changed decision is
+a new ADR with `Supersedes: ADR n`, or `ADR n, Dm` for one part; the old one becomes
+`Superseded by ADR m`, or gains `Superseded in part: Dm by ADR m` in its header and on
+that part's heading. How something works now lives in `README.md` and instruction files.
+
+### D5 — Status is a fixed value, and acceptance is the operator's commit
 
 The values are `Proposed`, `Accepted`, `Rejected`, `Deprecated`, `Superseded by ADR NNNN`.
-An ADR is written `Proposed` on its pull request and becomes `Accepted` or `Rejected` only
-when the operator says so, by a commit on that pull request setting the value and `Date`;
-then it merges. A rejected ADR merges too, so its reasoning stays in the log. `main` never
-holds a `Proposed` ADR. `Date` is the last status change.
+An ADR is written `Proposed` on its pull request, and the operator decides by a commit
+there that sets `Status` and `Date`. Then it merges, a rejected ADR too, so its reasoning
+stays. `main` holds decided ADRs only, and `Date` is the last status change.
 
-### D5 — An ADR fits in 150 lines
+### D6 — An ADR fits in 150 lines
 
-Everything above `## Sources` fits in 150 lines at 90 characters, about three pages.
-Fowler asks for "a single page", Microsoft for "pithy"; an agent reads the record whole.
-One that does not fit holds more than one question (D2).
+Everything above `## Sources` fits in 150 lines at 90 characters, about three pages, and
+an agent reads it whole. A record that needs more holds more than one question (D2).
 
-### D6 — An index, written by hand and checked
+### D7 — The index is generated by our own script
 
-`docs/adr/README.md` lists each ADR's number, title and status, one line each, checked
-against the files as `docs/MANUAL_STEPS.md` is. `AGENTS.md` sends an agent there first.
+`scripts/check_adrs.py --write` writes `docs/adr/README.md`, one line per ADR: number,
+title, status. The check fails while the file differs; `AGENTS.md` sends agents there.
 
-### D7 — A script holds the shape, a pull-request gate holds the freezing
+### D8 — A script holds the shape, a pull-request gate holds the freezing
 
-`scripts/check_adrs.py` joins the local checks: file name, header fields and values, parts
-in order, the ceiling, the index. A pull-request gate fails while an ADR in the diff is
-`Proposed`, and when an accepted ADR on the base branch changes outside its header.
+`scripts/check_adrs.py` runs in the local checks and the `check` job, on the file name,
+header, Y-statement, part order, ceiling and index. A pull-request gate stays red while an
+ADR in the diff is `Proposed`, or while an accepted one changes outside its header.
 
-### D8 — A rule an agent must follow is in an instruction file; the ADR holds why
+### D9 — A rule an agent must follow is in an instruction file; the ADR holds why
 
-A directive lives in `AGENTS.md`, a skill or a path rule, with `→ ADR n, Dm`, and never
-only in an ADR; `## Confirmation` names where. The trials above are why: an agent follows
-a rule its harness loads, not one in a file it might open.
+A directive lives in `AGENTS.md`, a skill or a path rule, with `→ ADR n, Dm`, and
+`## Confirmation` names that file. How an ADR is written goes to `.claude/rules/adrs.md`,
+scoped to `docs/adr/**`. The harness loads those files, and agents follow a loaded rule.
 
-### D9 — ADR 0002 takes the shape before acceptance; ADR 0001 is reshaped once
+### D10 — ADR 0001 is the worked example; ADR 0002 takes the shape before acceptance
 
-ADR 0002 is still `Proposed`, so it is rewritten before the operator decides on it. ADR
-0001 is reshaped once, in the pull request that brings in `check_adrs.py`, with nothing it
-decides changed; a decision that weighed no alternative says so rather than invent one.
+ADR 0001 takes the shape in this pull request, with every decision and its number kept:
+its prohibitions become positive statements, and a decision that weighed no alternative
+says so. ADR 0002 is still `Proposed` and is rewritten before the operator decides on it.
 
 ## Rejected alternatives
 
-- **MADR 4 verbatim** — its YAML front matter breaks the instruction-file rule and the
-  audit's header, and pros and cons per option double the length without saying when to
-  reconsider. **Reopens if** a tool the kit adopts reads that front matter.
-- **Nygard's five parts** — no alternatives and no confirmation. **Reopens** never.
-- **Structured records (YADR)** — rules here are markdown (ADR 0001, D1). **Reopens if** a
-  client or harness consumes them.
-- **Living records, updated in place**, as GDS asks — what turned the base's ADRs into
-  specs. **Reopens if** a supersession chain passes three hops.
-- **One decision per file, no D-numbers** — every rule cites `ADR n, Dm`. **Reopens if**
-  an ADR collects two `Superseded in part` lines.
-- **Decisions in commit trailers** (Lore) — a commit here is one line, and the proposal is
-  untested. **Reopens if** a study shows agents use them.
-- **A generated index** (adr-tools, Log4brains) — a tool outside `git` and `gh`.
-  **Reopens if** the log passes 50 records.
-- **`Proposed` as a pull-request state only** — an agent reading a branch has to see that
-  the ADR is not in force. **Reopens** never.
-- **A confidence field** (Microsoft, Fowler) — the *Reopens if* clause already says when
-  to look again. **Reopens if** the operator accepts a decision as a guess.
-- **"AI usage notes"** (Netflix) — D8 puts the directive where the harness loads it.
-  **Reopens if** agents act on an ADR's wording over the rule that cites it.
+| Option | Why not | Reopens if |
+|---|---|---|
+| MADR 4 verbatim | Its YAML front matter needs a parser the standard library lacks, and reads `Issue: #5` as empty, since `#` opens a comment; pros and cons per option double the length | a tool the kit adopts reads front matter |
+| Nygard's five parts | no alternatives, no confirmation, no re-evaluation trigger | never |
+| Structured records (YADR) | prose in YAML strings reads and diffs worse than markdown; new, with little uptake, and nothing here consumes it | a client or harness consumes structured records |
+| Living records, updated in place (UK GDS) | an edited record reads as the current spec, and agents follow a stale file over the code | a supersession chain passes three hops |
+| One decision per file, no D-numbers | every rule cites `ADR n, Dm`, and the parts of one answer read together | an ADR collects two `Superseded in part` lines |
+| Decisions in commit trailers (Lore) | it records why per commit, beside an ADR rather than in its place; untested beyond its proposal; costs the one-line commit rule | a study shows agents use the trailers |
+| A hand-written index | it drifts, and a check could only report what the script can write | never |
+| adr-tools or Log4brains | a CLI and a static site, for one maintainer whom the script and GitHub's view already serve | the log needs search or a site beyond GitHub's view |
+| Controlled syntax (EARS) for decisions | its *When … shall* is the conditional form agents followed least | a study shows a conditional followed as well as a direct sentence |
+| A prose linter (Vale) | a Go binary beside `git` and `gh`, for checks the script can hold | the log gains authors and its style drifts |
+| `Proposed` as pull-request state only | an agent reading a branch has to see that the ADR is not in force | never |
+| A confidence field (Microsoft, Fowler) | *Reopens if* already says when to look again | the operator accepts a decision as a guess |
+| "AI usage notes" (Netflix) | D9 puts the directive where the harness loads it | agents act on an ADR's wording over the rule that cites it |
 
 ## Consequences
 
-- An agent finds an ADR's decision, status and reopen condition by position.
-- A changed decision costs a new ADR, not a paragraph; the log grows and stays true.
-- Two more checks, and an ADR pull request stays red until the operator decides.
+- **Good:** an agent finds the decision in the first paragraph, the rest by position.
+- **Good:** the log stays true to what was decided and when, and the index tracks it.
+- **Bad:** every changed decision costs a new file, so the log grows.
+- **Bad:** two more checks, and an ADR pull request stays red until the operator decides.
+- **Bad:** a Y-statement takes work; one that will not come out marks an unclear decision.
 
 ## Confirmation
 
-- D1, D5, D6: `scripts/check_adrs.py`, in the `## Tooling` block and the `check` job.
-- D3, D4: the pull-request gate of D7, required by the ruleset.
-- D2, D8: by reading — `AGENTS.md`, *Where a new rule goes*, and `grooming-an-issue`.
-- D9: the two pull requests it names.
+- D1, D6, D7: `scripts/check_adrs.py`, in the `## Tooling` block and the `check` job.
+- D4, D5: the pull-request gate of D8, required by the ruleset.
+- D2, D3, D9: `.claude/rules/adrs.md` and `AGENTS.md`, *Where a new rule goes*, read.
+- D10: ADR 0001 in this pull request, ADR 0002 on PR 4.
 
 ## Follow-ups
 
 Filed as sub-issues of issue 5 once this ADR is accepted:
 
-1. `docs/adr/template.md` and `docs/adr/README.md`; `AGENTS.md`, `grooming-an-issue` and
-   `feature-lifecycle` point at them and name the statuses (D1, D4, D6, D8).
-2. `scripts/check_adrs.py` with tests, in the local checks and `checks.yml`, with ADR 0001
-   reshaped in the same pull request (D1, D5, D6, D7, D9).
-3. The pull-request gate for `Proposed` and frozen ADRs, required by the ruleset (D7).
-4. ADR 0002 rewritten into the shape, on issue 1's pull request (D9).
+1. `docs/adr/template.md` and `.claude/rules/adrs.md`; `AGENTS.md`, `grooming-an-issue`
+   and `feature-lifecycle` point at them and name the statuses (D1, D3, D5, D9).
+2. `scripts/check_adrs.py` with tests and `--write`, in the local checks and `checks.yml`,
+   and the `docs/adr/README.md` it writes (D1, D6, D7, D8).
+3. The pull-request gate for `Proposed` and frozen ADRs, required by the ruleset (D8).
+4. ADR 0002 rewritten into the shape, on issue 1's pull request (D10).
 
 ## Sources
 
@@ -157,6 +157,8 @@ Read on 2026-11-27.
 - [MADR](https://adr.github.io/madr/) 4.0.0, 2024-09-17, and its
   [develop template](https://raw.githubusercontent.com/adr/madr/develop/template/adr-template.md).
 - [ADR templates](https://adr.github.io/adr-templates): Nygard, MADR, Y-statements.
+- O. Zimmermann, [Y-statements](https://medium.com/olzzio/y-statements-10eb07b5a177), and
+  the [Y-form template](https://socadk.github.io/design-practice-repository/artifact-templates/DPR-ArchitecturalDecisionRecordYForm).
 - AWS Prescriptive Guidance, [ADR process](https://docs.aws.amazon.com/prescriptive-guidance/latest/architectural-decision-records/adr-process.html)
   and [best practices](https://docs.aws.amazon.com/prescriptive-guidance/latest/architectural-decision-records/best-practices.html).
 - Microsoft, [Architecture decision record](https://learn.microsoft.com/en-us/azure/well-architected/architect-role/architecture-decision-record),
@@ -168,7 +170,18 @@ Read on 2026-11-27.
   2026-11-23.
 - Zhu et al., [Precedent or Intent? What coding agents follow when evolving existing code](https://arxiv.org/abs/2610.38244),
   2026-10-28.
+- Tsuchida et al., [Do Coding Agents Follow AGENTS.md? The Effect of Policy Wording on Instruction Compliance](https://arxiv.org/abs/2611.04367),
+  2026-11-03.
+- D. McMillan, [Instruction Adherence in Coding Agent Configuration Files](https://arxiv.org/abs/2605.10039),
+  2026-05-11.
+- X. Xu and W. Wu, [Stale Instruction Files Override the Code in Coding Agents](https://arxiv.org/abs/2610.30571),
+  2026-10-22.
+- InfoQ, [New research reassesses the value of AGENTS.md files](https://www.infoq.com/news/2026/03/agents-context-file-value-review/),
+  2026-03-06, on Gloaguen et al. (ETH Zurich).
 - Stetsenko, [Lore: git commit messages as a knowledge protocol for coding agents](https://arxiv.org/abs/2603.15566),
   2026-03-16.
-- N. Jain, [ADRs for AI coding agents](https://dev.to/naman_here/adrs-for-ai-coding-agents-how-to-make-every-agent-read-architecture-decisions-3he4),
-  a vendor's post, read for its practice.
+- [EARS](https://en.wikipedia.org/wiki/Easy_Approach_to_Requirements_Syntax), Mavin et al.,
+  RE'09.
+- [Vale](https://vale.sh/), and its use at [Elastic](https://www.elastic.co/docs/contribute-docs/vale-linter)
+  and [GitLab](https://docs.gitlab.com/development/documentation/testing/vale).
+- [Log4brains](https://www.npmjs.com/package/log4brains), 1.1.0, 2024-12-17.
