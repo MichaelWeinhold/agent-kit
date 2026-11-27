@@ -1,0 +1,67 @@
+name: Checks
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    # Pinned rather than ubuntu-latest: that label migrates to Ubuntu 26 from
+    # 2026-10-19, and an image that changes on a date nobody chose is a green
+    # result discovered rather than confirmed. Bump it deliberately, in a PR.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
+        with:
+          enable-cache: true
+
+      # --locked, so a stale lock reddens a PR rather than surprising a later sync.
+      - name: Sync dependencies
+        run: uv sync --locked
+
+      - name: Lint
+        run: uv run ruff check .
+
+      - name: Format check
+        run: uv run ruff format --check .
+
+      # The key ends in the commit so every run saves, and the restore key finds the
+      # newest cache for the same lock and config. Caches are scoped by ref, so a PR
+      # falls back to its own branch's and then to main's. mypy's own invalidation
+      # keeps a stale cache correct.
+      - name: Restore mypy cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: .mypy_cache
+          key: mypy-${{ runner.os }}-${{ hashFiles('uv.lock', 'pyproject.toml') }}-${{ github.sha }}
+          restore-keys: mypy-${{ runner.os }}-${{ hashFiles('uv.lock', 'pyproject.toml') }}-
+
+      - name: Type check
+        run: uv run mypy scripts tests .claude/hooks
+
+      - name: Test
+        run: uv run pytest
+
+      - name: Instruction files
+        run: uv run python scripts/check_instructions.py
+
+  secrets:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      # .gitignore is the one list of what must never be tracked; this asks it
+      # rather than keeping a second copy that drifts out of step with it.
+      - name: Fail if a secret file is tracked
+        run: |
+          if git ls-files | git check-ignore --no-index --stdin; then
+            echo "The files above are tracked in git and .gitignore says they must not be"
+            exit 1
+          fi
