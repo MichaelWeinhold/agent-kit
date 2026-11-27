@@ -1,6 +1,6 @@
 # 3. An ADR answers one question, in a fixed shape, and is frozen once accepted
 
-- **Status:** Proposed
+- **Status:** Accepted
 - **Date:** 2026-11-27
 - **Issue:** #5
 
