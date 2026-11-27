@@ -2,7 +2,6 @@
 
 - **Status:** Accepted
 - **Date:** 2026-11-27
-- **Issue:** none; recorded with the bootstrap, issue 2
 
 In the context of a workflow kit whose code agents write and one person steers, facing
 agents that rebuild a procedure from memory and repositories that inherit every rule, we

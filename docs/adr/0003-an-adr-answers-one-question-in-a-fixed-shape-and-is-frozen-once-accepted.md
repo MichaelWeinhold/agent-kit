@@ -37,7 +37,7 @@ Every ADR is `docs/adr/NNNN-<slug>.md`, with these parts in this order:
 | Part | Holds | Required |
 |---|---|---|
 | `# N. <title>` | the decision as a statement | always |
-| header | `Status`, `Date`, `Issue`; `Supersedes`, `Superseded in part` when they apply | always |
+| header | `Status`, `Date`; `Issue` on a research ADR; `Supersedes`, `Superseded in part` when they apply | always |
 | Y-statement | one paragraph: *In the context of … facing … we decided for … and against … to achieve … accepting …* | always |
 | `## Context` | bullets of facts the code cannot show, sourced where read | always |
 | `## Decision` | `### D1 — …` onward | always |
@@ -48,8 +48,8 @@ Every ADR is `docs/adr/NNNN-<slug>.md`, with these parts in this order:
 | `## Sources` | what was read, linked and dated | research |
 
 The header is bold bullets, `- **Status:** Accepted`, which one regular expression reads,
-as `check_issue_umbrellas.py` does. `Issue` is the research issue answered, `#<n>`, or
-`none` and the issue it was recorded with. `docs/adr/template.md` holds the skeleton.
+as `check_issue_umbrellas.py` does. `Issue: #<n>` names the research issue answered; an
+ADR that answers none leaves it out. `docs/adr/template.md` holds the skeleton.
 
 ### D2 — An ADR answers one question; D1…Dn are the parts of its answer
 
@@ -95,14 +95,13 @@ ADR in the diff is `Proposed`, or while an accepted one changes outside its head
 ### D9 — A rule an agent must follow is in an instruction file; the ADR holds why
 
 A directive lives in `AGENTS.md`, a skill or a path rule, with `→ ADR n, Dm`, and
-`## Confirmation` names that file. How an ADR is written goes to `.claude/rules/adrs.md`,
-scoped to `docs/adr/**`. The harness loads those files, and agents follow a loaded rule.
+`## Confirmation` names that file. Writing an ADR is the `writing-an-adr` skill, whose
+description loads at startup: copy the template, fill it by D1 to D6, run the check.
 
 ### D10 — ADR 0001 is the worked example; ADR 0002 takes the shape before acceptance
 
-ADR 0001 takes the shape in this pull request, with every decision and its number kept:
-its prohibitions become positive statements, and a decision that weighed no alternative
-says so. ADR 0002 is still `Proposed` and is rewritten before the operator decides on it.
+ADR 0001 takes the shape in this pull request, every decision and number kept and its
+prohibitions made positive. ADR 0002, still `Proposed`, is rewritten before it is decided.
 
 ## Rejected alternatives
 
@@ -120,29 +119,30 @@ says so. ADR 0002 is still `Proposed` and is rewritten before the operator decid
 | A prose linter (Vale) | a Go binary beside `git` and `gh`, for checks the script can hold | the log gains authors and its style drifts |
 | `Proposed` as pull-request state only | an agent reading a branch has to see that the ADR is not in force | never |
 | A confidence field (Microsoft, Fowler) | *Reopens if* already says when to look again | the operator accepts a decision as a guess |
+| The style as a path rule on `docs/adr/**` | it loads once an ADR is read, and an agent creating one may read none | the client loads path rules for a file being written |
 | "AI usage notes" (Netflix) | D9 puts the directive where the harness loads it | agents act on an ADR's wording over the rule that cites it |
 
 ## Consequences
 
 - **Good:** an agent finds the decision in the first paragraph, the rest by position.
 - **Good:** the log stays true to what was decided and when, and the index tracks it.
-- **Bad:** every changed decision costs a new file, so the log grows.
-- **Bad:** two more checks, and an ADR pull request stays red until the operator decides.
+- **Bad:** a new file per changed decision, two more checks, and an ADR pull request that
+  stays red until the operator decides.
 - **Bad:** a Y-statement takes work; one that will not come out marks an unclear decision.
 
 ## Confirmation
 
 - D1, D6, D7: `scripts/check_adrs.py`, in the `## Tooling` block and the `check` job.
 - D4, D5: the pull-request gate of D8, required by the ruleset.
-- D2, D3, D9: `.claude/rules/adrs.md` and `AGENTS.md`, *Where a new rule goes*, read.
+- D2, D3, D9: the `writing-an-adr` skill, and `AGENTS.md`, *Where a new rule goes*.
 - D10: ADR 0001 in this pull request, ADR 0002 on PR 4.
 
 ## Follow-ups
 
 Filed as sub-issues of issue 5 once this ADR is accepted:
 
-1. `docs/adr/template.md` and `.claude/rules/adrs.md`; `AGENTS.md`, `grooming-an-issue`
-   and `feature-lifecycle` point at them and name the statuses (D1, D3, D5, D9).
+1. `docs/adr/template.md` and the `writing-an-adr` skill, named by `grooming-an-issue` and
+   `feature-lifecycle`; `AGENTS.md` names the statuses (D1, D3, D5, D9).
 2. `scripts/check_adrs.py` with tests and `--write`, in the local checks and `checks.yml`,
    and the `docs/adr/README.md` it writes (D1, D6, D7, D8).
 3. The pull-request gate for `Proposed` and frozen ADRs, required by the ruleset (D8).
