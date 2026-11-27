@@ -157,7 +157,22 @@ def from_gh(repo: Path, number: int) -> object:
     return parsed
 
 
+def tracked(repo: Path, revision: str) -> bool:
+    result = subprocess.run(
+        [GIT, "ls-tree", "--name-only", revision, "--", MANIFEST],
+        cwd=repo,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        raise AuditError(result.stderr.strip() or f"{GIT} ls-tree exited {result.returncode}")
+    return bool(result.stdout.strip())
+
+
 def from_git(repo: Path, revision: str) -> str:
+    if not tracked(repo, revision):
+        return ""
     result = subprocess.run(
         [GIT, "show", f"{revision}:{MANIFEST}"],
         cwd=repo,

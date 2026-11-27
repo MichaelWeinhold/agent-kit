@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+import subprocess
 from pathlib import Path
 
 import pytest
 
-from check_dependencies import QUESTIONS, main, packages, problems, sections
+from check_dependencies import QUESTIONS, from_git, main, packages, problems, sections
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 BASE = "a" * 40
@@ -50,6 +51,28 @@ def test_a_new_package_without_its_section_fails(capsys: pytest.CaptureFixture[s
 def test_a_new_package_with_its_section_passes() -> None:
     after = BEFORE.replace('"pydantic>=2.13"', '"pydantic>=2.13", "rich>=14"')
     assert run(after, f"## Summary\n\nAdds rich.\n\n{answered('rich')}\n") == 0
+
+
+def test_a_first_manifest_makes_every_package_new(capsys: pytest.CaptureFixture[str]) -> None:
+    body = "\n\n".join(answered(name) for name in ("httpx", "pydantic", "pytest"))
+    assert run(BEFORE, body, before="") == 1
+    captured = capsys.readouterr()
+    assert captured.out == "PR #610 adds httpx, pydantic, pytest, ruff and removes none\n"
+    assert "'## Dependency: ruff'" in captured.err
+
+
+def test_a_manifest_absent_at_a_revision_reads_as_empty(tmp_path: Path) -> None:
+    def git(*args: str) -> str:
+        return subprocess.run(
+            ["git", *args], cwd=tmp_path, capture_output=True, text=True, check=True
+        ).stdout.strip()
+
+    git("init", "-q")
+    (tmp_path / "README.md").write_text("x\n", encoding="utf-8")
+    git("add", "README.md")
+    git("-c", "user.name=t", "-c", "user.email=t@example.invalid", "commit", "-qm", "x")
+    (tmp_path / "pyproject.toml").write_text(BEFORE, encoding="utf-8")
+    assert from_git(tmp_path, git("rev-parse", "HEAD")) == ""
 
 
 def test_a_new_dev_package_without_its_section_fails() -> None:
