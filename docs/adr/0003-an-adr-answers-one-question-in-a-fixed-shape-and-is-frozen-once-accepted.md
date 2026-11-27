@@ -98,10 +98,11 @@ A directive lives in `AGENTS.md`, a skill or a path rule, with `→ ADR n, Dm`, 
 `## Confirmation` names that file. Writing an ADR is the `writing-an-adr` skill, whose
 description loads at startup: copy the template, fill it by D1 to D6, run the check.
 
-### D10 — ADR 0001 is the worked example; ADR 0002 takes the shape before acceptance
+### D10 — The skill is tested on ADRs 0001 and 0003, and writes ADR 0002
 
-ADR 0001 takes the shape in this pull request, every decision and number kept and its
-prohibitions made positive. ADR 0002, still `Proposed`, is rewritten before it is decided.
+ADR 0001 takes the shape here, every decision and number kept, its prohibitions positive.
+Once built, the skill re-creates ADRs 0001 and 0003 as its test, before the D8 gate: the
+one change outside D4, decisions kept. ADR 0002 is rewritten with it before it is decided.
 
 ## Rejected alternatives
 
@@ -113,7 +114,6 @@ prohibitions made positive. ADR 0002, still `Proposed`, is rewritten before it i
 | Living records, updated in place (UK GDS) | an edited record reads as the current spec, and agents follow a stale file over the code | a supersession chain passes three hops |
 | One decision per file, no D-numbers | every rule cites `ADR n, Dm`, and the parts of one answer read together | an ADR collects two `Superseded in part` lines |
 | Decisions in commit trailers (Lore) | it records why per commit, beside an ADR rather than in its place; untested beyond its proposal; costs the one-line commit rule | a study shows agents use the trailers |
-| A hand-written index | it drifts, and a check could only report what the script can write | never |
 | adr-tools or Log4brains | a CLI and a static site, for one maintainer whom the script and GitHub's view already serve | the log needs search or a site beyond GitHub's view |
 | Controlled syntax (EARS) for decisions | its *When … shall* is the conditional form agents followed least | a study shows a conditional followed as well as a direct sentence |
 | A prose linter (Vale) | a Go binary beside `git` and `gh`, for checks the script can hold | the log gains authors and its style drifts |
@@ -135,18 +135,18 @@ prohibitions made positive. ADR 0002, still `Proposed`, is rewritten before it i
 - D1, D6, D7: `scripts/check_adrs.py`, in the `## Tooling` block and the `check` job.
 - D4, D5: the pull-request gate of D8, required by the ruleset.
 - D2, D3, D9: the `writing-an-adr` skill, and `AGENTS.md`, *Where a new rule goes*.
-- D10: ADR 0001 in this pull request, ADR 0002 on PR 4.
+- D10: ADRs 0001 and 0003 in follow-up 2, ADR 0002 on PR 4.
 
 ## Follow-ups
 
-Filed as sub-issues of issue 5 once this ADR is accepted:
+Filed as sub-issues of issue 5 once this ADR is accepted, and worked in this order:
 
-1. `docs/adr/template.md` and the `writing-an-adr` skill, named by `grooming-an-issue` and
-   `feature-lifecycle`; `AGENTS.md` names the statuses (D1, D3, D5, D9).
-2. `scripts/check_adrs.py` with tests and `--write`, in the local checks and `checks.yml`,
+1. `scripts/check_adrs.py` with tests and `--write`, in the local checks and `checks.yml`,
    and the `docs/adr/README.md` it writes (D1, D6, D7, D8).
+2. `docs/adr/template.md` and the `writing-an-adr` skill, tested by re-creating ADRs 0001
+   and 0003; `grooming-an-issue`, `feature-lifecycle` and `AGENTS.md` point at it (D1, D3,
+   D5, D9, D10).
 3. The pull-request gate for `Proposed` and frozen ADRs, required by the ruleset (D8).
-4. ADR 0002 rewritten into the shape, on issue 1's pull request (D10).
 
 ## Sources
 
