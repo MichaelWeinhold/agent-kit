@@ -23,4 +23,4 @@ paths:
 ## Running the suite
 
 Replay a red with the `--randomly-seed=<n>` it printed, never a retry. Debug one test with
-`-n 0 -p no:randomly`; never pin an order or raise `timeout`.
+`-p no:randomly`; never pin an order.
